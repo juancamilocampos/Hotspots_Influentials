@@ -36,16 +36,17 @@ class GraphRetweets:
                                                                 'followers': tweet["object"]["actor"][
                                                                     "followersCount"]}))
 
+        print(len(self.edges))
         self.edges_weight = Counter(self.edges).most_common()
         self.edges_weight = [(s[0][0], s[0][1], s[1]) for s in self.edges_weight]
 
         self.graphdi.add_nodes_from(self.nodes)
         self.graphdi.add_weighted_edges_from(self.edges_weight)
 
-        self.edges = [sorted(s) for s in self.edges]
+        self.edges = sorted(self.edges, key=lambda node: node[0])
         self.undirected_edges_weight = Counter(self.edges).most_common()
-        self.undirected_edges_weight = [(s[0][0], s[0][1], s[1]) for s in self.edges_weight]
+        self.undirected_edges_weight = [(s[0][0], s[0][1], (s[1])) for s in self.undirected_edges_weight]
         self.graph.add_nodes_from(self.nodes)
-        self.graph.add_weighted_edges_from(self.edges_weight)
+        self.graph.add_weighted_edges_from(self.undirected_edges_weight)
 
         return [self.graphdi, self.graph]
