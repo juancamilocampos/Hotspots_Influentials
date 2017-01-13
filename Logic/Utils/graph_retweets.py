@@ -29,21 +29,22 @@ class GraphRetweets:
 
         # sorted is used to obtain the total weight in a direct graph
         for tweet in cursor:
-            self.edges.append((tweet["actor"]["id"], tweet["object"]["actor"]["id"]))
+            if tweet["actor"]["id"] != tweet["object"]["actor"]["id"]:
+                self.edges.append((tweet["actor"]["id"], tweet["object"]["actor"]["id"]))
+
             self.nodes.append((tweet["actor"]["id"], {'friends': tweet["actor"]["friendsCount"],
-                                                      'followers': tweet["actor"]["followersCount"]}))
+                                                        'followers': tweet["actor"]["followersCount"]}))
             self.nodes.append((tweet["object"]["actor"]["id"], {'friends': tweet["object"]["actor"]["friendsCount"],
                                                                 'followers': tweet["object"]["actor"][
                                                                     "followersCount"]}))
 
-        print(len(self.edges))
         self.edges_weight = Counter(self.edges).most_common()
         self.edges_weight = [(s[0][0], s[0][1], s[1]) for s in self.edges_weight]
 
         self.graphdi.add_nodes_from(self.nodes)
         self.graphdi.add_weighted_edges_from(self.edges_weight)
 
-        self.edges = sorted(self.edges, key=lambda node: node[0])
+        self.edges = [tuple(sorted(s)) for s in self.edges]
         self.undirected_edges_weight = Counter(self.edges).most_common()
         self.undirected_edges_weight = [(s[0][0], s[0][1], (s[1])) for s in self.undirected_edges_weight]
         self.graph.add_nodes_from(self.nodes)

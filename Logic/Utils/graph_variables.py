@@ -154,7 +154,6 @@ def users_entrophy(C, H):
 
 def parallel_dijkstra(g, k, z):
     nbors = type_ident(g, z)
-
     nx.set_node_attributes(g, 'Dv', 1000)
     nx.set_node_attributes(g, 'V', 0)
     nx.set_node_attributes(g, 'visit', 0)
@@ -248,21 +247,30 @@ def graph_hotspots(dict_voronoi, K, g, maxdistance):
     c = 0
     for i in range(len(K)):
         nodes_distribution.append(nodes_distribution[-1] + cellsizes[i][1])
-        [x, y] = [1.0 * (i + 1) / len(K), 1.0 * nodes_distribution[-1] / nnodes]
+        [x, y] = [1.0 * (i + 1) / ncells, 1.0 * nodes_distribution[-1] / nnodes]
         influentials_distribution.append([x, y])
         if y <= 0.3:
             c = x
             px = i
 
-    # If more than the 70% of influentials are contained in the 30% of the network, then there are hostposts and it stars to calculate them.
+    # If more than the 70% of influentials are contained in the 30% of the network, then there are hostposts and
+    # it stars to calculate them.
+
     if c >= 0.70:
+
         # Hk is the set of the breaking nodes which build the "small" voronoi cells.
         Hk = list()
         for i in range(px):
             Hk.append(cellsizes[i][0])
 
-        final_hotspots = _hotspots_breaking_nodes(dict_voronoi, Hk, g, maxdistance)
-        return [True, c, final_hotspots]
+        weights_distribution = list()
+        for node1 in Hk:
+            weights_distribution.append(nx.dijkstra_path_length(g, source=Hk[0], target=node1))
+
+        # final_hotspots = _hotspots_breaking_nodes(dict_voronoi, Hk, g, maxdistance)
+        # return [True, c, final_hotspots]
+        return [True, c, weights_distribution]
+
     else:
         return [False, 0, {}]
 
@@ -295,15 +303,15 @@ def _hotspots_breaking_nodes(dict_voronoi, Hk, g, maxdistance):
         while j < len(Hk):
             if hotspots[i] != hotspots[j]:
                 ##Here two voronoi cells are integrated in the same hotspot if their distance is less than the maxdistance
-                if len(nx.shortest_path(g, source=Hk[i], target=Hk[j])) <= maxdistance:
+                if nx.dijkstra_path_length(g, source=Hk[i], target=Hk[j]) <= maxdistance:
                     gs = g.subgraph(list(set(dict_voronoi[Hk[i]]).union(set(dict_voronoi[Hk[i]]))))
-                    if nx.is_connected(g):
+                    if nx.is_connected(gs):
                         hotspot_son = hotspots[j]
                         hotspot_parent = hotspots[i]
                         hotspots = _replace(hotspots, hotspot_son, hotspot_parent)
 
-            j = j + 1
-        i = i + 1
+            j += 1
+        i += 1
 
     hotspots_set = list(set(hotspots))
     final_hotspots = list()

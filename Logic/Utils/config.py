@@ -69,7 +69,7 @@ class Configuration:
         return 'Tweets'
 
     def MONGO_COLL_TweetsGnip(self):
-        return "tweetsGNIP27"
+        return "tweetsGNIP25"
 
     def MONGO_COLL_LOGICCONVERSATION(self):
         """
