@@ -31,7 +31,7 @@ class GraphRetweets:
         for tweet in cursor:
             self.edges.append((tweet["actor"]["id"], tweet["object"]["actor"]["id"]))
             self.nodes.append((tweet["actor"]["id"], {'friends': tweet["actor"]["friendsCount"],
-                                                      'followers': tweet["actor"]["followersCount"]}))
+                                                        'followers': tweet["actor"]["followersCount"]}))
             self.nodes.append((tweet["object"]["actor"]["id"], {'friends': tweet["object"]["actor"]["friendsCount"],
                                                                 'followers': tweet["object"]["actor"][
                                                                     "followersCount"]}))
