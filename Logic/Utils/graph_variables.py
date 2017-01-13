@@ -264,8 +264,9 @@ def graph_hotspots(dict_voronoi, K, g, maxdistance):
             Hk.append(cellsizes[i][0])
 
         weights_distribution = list()
-        for node1 in Hk:
-            weights_distribution.append(nx.dijkstra_path_length(g, source=Hk[0], target=node1))
+        print(Hk[0])
+        for i in range(1,len(Hk)):
+            weights_distribution.append(nx.dijkstra_path_length(g, source=Hk[0], target=Hk[i]))
 
         # final_hotspots = _hotspots_breaking_nodes(dict_voronoi, Hk, g, maxdistance)
         # return [True, c, final_hotspots]
